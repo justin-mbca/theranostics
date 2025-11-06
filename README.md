@@ -30,5 +30,19 @@ python scripts/run_demo.py
 pytest -q
 ```
 
+Run the Prefect demo (local):
+
+```bash
+# ensure venv activated
+python -m pip install -r requirements.txt
+python -c "from theranostics.flow import pipeline_with_dicom; pipeline_with_dicom(dicom_dir='path/to/dicom', out_parquet='data/bronze/dicom.parquet')"
+```
+
+Coverage report (locally):
+
+```bash
+pytest --cov=theranostics --cov-report=xml:coverage.xml
+```
+
 Notes
 - This is a small local prototype. For production use the architecture in the design doc: object storage, feature store, secured FHIR/DICOM connectors, and managed model infra.

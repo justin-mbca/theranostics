@@ -1,0 +1,55 @@
+name: PR Test Comment
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-and-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov
+
+      - name: Run tests
+        id: run-tests
+        run: |
+          set -o pipefail
+          pytest -q --junitxml=results.xml --cov=theranostics --cov-report=xml:coverage.xml | tee pytest.out || true
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-test-results
+          path: |
+            results.xml
+            coverage.xml
+            pytest.out
+
+      - name: Post comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            let out = '';
+            try { out = fs.readFileSync('pytest.out','utf8'); } catch(e) { out = 'No output'; }
+            const passed = out.includes('passed');
+            const body = `Automated tests completed.\n\n<details><summary>Test output (truncated)</summary>\n\n${out.slice(0,1000)}\n\n</details>`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            })
