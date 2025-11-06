@@ -4,6 +4,7 @@ from __future__ import annotations
 from prefect import flow, task
 from .simulate import generate_cohort
 from .models import fit_km, fit_cox
+from theranostics.dicom_ingest import ingest_directory
 
 
 @task
@@ -26,6 +27,22 @@ def train_models(df):
 def pipeline_demo(n: int = 500):
     df = make_data(n)
     results = train_models(df)
+    return results
+
+
+@task
+def dicom_ingest_task(dicom_dir: str, out_parquet: str):
+    # use ingest_directory with to_parquet=True to write a parquet artifact
+    return ingest_directory(dicom_dir, out_parquet, to_parquet=True)
+
+
+@flow
+def pipeline_with_dicom(n: int = 500, dicom_dir: str = None, out_parquet: str = 'data/bronze/dicom.parquet'):
+    df = make_data(n)
+    results = train_models(df)
+    if dicom_dir:
+        dicom_count = dicom_ingest_task.submit(dicom_dir, out_parquet)
+        return {**results, 'dicom_count': dicom_count}
     return results
 
 
