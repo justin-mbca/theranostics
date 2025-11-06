@@ -1,4 +1,6 @@
 ![CI](https://github.com/justin-mbca/theranostics/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/justin-mbca/theranostics/branch/main/graph/badge.svg?token=CODECOV_TOKEN)](https://codecov.io/gh/justin-mbca/theranostics)
+
 
 Theranostics - Local prototype
 
