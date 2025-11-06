@@ -1,5 +1,12 @@
 """CLI to run DICOM directory ingest."""
 import sys
+from pathlib import Path
+
+# ensure the repo root is on sys.path so this script can be run directly
+repo_root = str(Path(__file__).resolve().parents[1])
+if repo_root not in sys.path:
+    sys.path.insert(0, repo_root)
+
 from theranostics.dicom_ingest import ingest_directory
 
 
