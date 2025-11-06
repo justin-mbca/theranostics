@@ -38,10 +38,18 @@ def dicom_ingest_task(dicom_dir: str, out_parquet: str):
 
 @flow
 def pipeline_with_dicom(n: int = 500, dicom_dir: str = None, out_parquet: str = 'data/bronze/dicom.parquet'):
+    """Run the demo pipeline and optionally ingest DICOMs.
+
+    Returns a dict with model results. If `dicom_dir` is provided the dict
+    will include the numeric key `dicom_count` (int) indicating how many
+    DICOM files were processed and written to `out_parquet`.
+    """
+
     df = make_data(n)
     results = train_models(df)
     if dicom_dir:
-        dicom_count = dicom_ingest_task.submit(dicom_dir, out_parquet)
+        # Call the task synchronously so the flow returns the numeric count
+        dicom_count = dicom_ingest_task(dicom_dir, out_parquet)
         return {**results, 'dicom_count': dicom_count}
     return results
 
