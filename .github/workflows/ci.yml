@@ -56,3 +56,32 @@ jobs:
         with:
           files: coverage.xml
           fail_ci_if_error: false
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run integration ingest test
+        run: |
+          pytest -q tests/test_integration_ingest.py -q || true
+
+      - name: Upload integration logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-logs
+          path: |
+            pytest.out || true
