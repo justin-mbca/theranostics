@@ -1,3 +1,5 @@
+![CI](https://github.com/justin-mbca/theranostics/actions/workflows/ci.yml/badge.svg)
+
 Theranostics - Local prototype
 
 This repository contains a minimal local prototype for the Biomedical Data Scientist pipeline.
