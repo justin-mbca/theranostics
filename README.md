@@ -40,6 +40,14 @@ python -m pip install -r requirements.txt
 python -c "from theranostics.flow import pipeline_with_dicom; pipeline_with_dicom(dicom_dir='path/to/dicom', out_parquet='data/bronze/dicom.parquet')"
 ```
 
+Documentation
+-------------
+For this feature branch we've added short docs describing the synthetic input simulation and how to interpret experiment outputs:
+
+- `docs/input_simulation.md` — explains the cohort generator and parameters
+- `docs/results_explanation.md` — explains Kaplan–Meier and Cox outputs and interpretation
+
+
 Coverage report (locally):
 
 ```bash
