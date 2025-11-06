@@ -11,6 +11,8 @@ Files of note in this branch:
 - `reports/grid_sweep_report.md` — quick human-readable report and reproduction steps
 - `.github/workflows/ci.yml` — added `smoke-lifelines` job which runs a minimal CoxPHFitter check
 - `theranostics/_compat.py` — small runtime compatibility shim loaded on import to work around pandas/lifelines/scipy mismatches during local development
+ - `docs/input_simulation.md` — description of how the synthetic cohort is generated and parameters to tune
+ - `docs/results_explanation.md` — explanation of Cox/KM outputs and interpretation guidance
 
 ## Why
 
