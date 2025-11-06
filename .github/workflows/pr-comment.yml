@@ -38,6 +38,28 @@ jobs:
             coverage.xml
             pytest.out
 
+      - name: Compute coverage percent
+        if: always()
+        run: |
+          python - <<'PY'
+import xml.etree.ElementTree as ET
+percent = 0.0
+try:
+    tree = ET.parse('coverage.xml')
+    root = tree.getroot()
+    if root.tag == 'coverage' and 'line-rate' in root.attrib:
+        percent = float(root.attrib['line-rate']) * 100
+    else:
+        metrics = root.find('.//metrics')
+        if metrics is not None and 'covered' in metrics.attrib and 'lines' in metrics.attrib:
+            covered = int(metrics.attrib['covered'])
+            total = int(metrics.attrib['lines'])
+            percent = covered / total * 100 if total else 0.0
+except Exception:
+    percent = 0.0
+open('coverage.txt','w').write(f"{percent:.1f}")
+PY
+
       - name: Post comment
         uses: actions/github-script@v6
         with:
@@ -45,8 +67,94 @@ jobs:
             const fs = require('fs');
             let out = '';
             try { out = fs.readFileSync('pytest.out','utf8'); } catch(e) { out = 'No output'; }
+            let cov = 'n/a';
+            try { cov = fs.readFileSync('coverage.txt','utf8'); } catch(e) { cov = 'n/a'; }
+            const body = `Automated tests completed.\n\nCoverage: ${cov}%\n\n<details><summary>Test output (truncated)</summary>\n\n${out.slice(0,1000)}\n\n</details>`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            })
+name: PR Test Comment
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-and-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov
+
+      - name: Run tests
+        id: run-tests
+        run: |
+          set -o pipefail
+          pytest -q --junitxml=results.xml --cov=theranostics --cov-report=xml:coverage.xml | tee pytest.out || true
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-test-results
+          path: |
+            results.xml
+            coverage.xml
+            pytest.out
+    - name: Compute coverage percent
+    if: always()
+    run: |
+      python - <<'PY'
+import xml.etree.ElementTree as ET
+try:
+  tree = ET.parse('coverage.xml')
+  root = tree.getroot()
+  # coverage.py writes <coverage> root with 'line-rate' or 'lines-covered' attributes depending on reporter
+  percent = None
+  # try to find <coverage> with line-rate
+  if root.tag == 'coverage' and 'line-rate' in root.attrib:
+    percent = float(root.attrib['line-rate']) * 100
+  else:
+    # search for metrics node
+    metrics = root.find('.//metrics')
+    if metrics is not None and 'covered' in metrics.attrib and 'lines' in metrics.attrib:
+      covered = int(metrics.attrib['covered'])
+      total = int(metrics.attrib['lines'])
+      percent = covered / total * 100 if total else 0.0
+  if percent is None:
+    # fallback: write 0
+    percent = 0.0
+except Exception:
+  percent = 0.0
+open('coverage.txt','w').write(f"{percent:.1f}")
+PY
+
+
+      - name: Post comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            let out = '';
+            try { out = fs.readFileSync('pytest.out','utf8'); } catch(e) { out = 'No output'; }
+            let cov = 'n/a';
+            try { cov = fs.readFileSync('coverage.txt','utf8'); } catch(e) { cov = 'n/a'; }
             const passed = out.includes('passed');
-            const body = `Automated tests completed.\n\n<details><summary>Test output (truncated)</summary>\n\n${out.slice(0,1000)}\n\n</details>`;
+            const body = `Automated tests completed.\n\nCoverage: ${cov}%\n\n<details><summary>Test output (truncated)</summary>\n\n${out.slice(0,1000)}\n\n</details>`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
