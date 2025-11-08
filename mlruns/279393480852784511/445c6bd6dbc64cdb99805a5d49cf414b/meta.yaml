@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/justin/theranostics/mlruns/279393480852784511/445c6bd6dbc64cdb99805a5d49cf414b/artifacts
+end_time: 1762462496874
+entry_point_name: ''
+experiment_id: '279393480852784511'
+lifecycle_stage: active
+run_id: 445c6bd6dbc64cdb99805a5d49cf414b
+run_name: casual-zebra-318
+run_uuid: 445c6bd6dbc64cdb99805a5d49cf414b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1762462496867
+status: 3
+tags: []
+user_id: justin

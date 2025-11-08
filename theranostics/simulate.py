@@ -6,7 +6,7 @@ import pandas as pd
 from typing import Tuple
 
 
-def generate_cohort(n: int = 500, seed: int = 42) -> pd.DataFrame:
+def generate_cohort(n: int = 500, seed: int = 42, censor_rate: float = 0.0, biomarker_effect: float = 0.3) -> pd.DataFrame:
     """Generate a synthetic cohort with clinical features and time-to-event labels.
 
     Columns:
@@ -33,7 +33,7 @@ def generate_cohort(n: int = 500, seed: int = 42) -> pd.DataFrame:
     treatment_coef = {"A": 1.0, "B": 0.8}
 
     linear = np.array([stage_coef[s] for s in tumor_stage])
-    linear += biomarker * 0.3
+    linear += biomarker * biomarker_effect
     linear *= np.array([treatment_coef[t] for t in treatment_group])
 
     # Weibull-like survival times
@@ -46,6 +46,16 @@ def generate_cohort(n: int = 500, seed: int = 42) -> pd.DataFrame:
     censor_time = 365 * 3
     observed_time = np.minimum(times, censor_time)
     event = (times <= censor_time).astype(int)
+
+    # additional random censoring controlled by censor_rate (0.0 = none)
+    if censor_rate and 0.0 < censor_rate < 1.0:
+        # randomly pick a fraction of subjects to be censored earlier
+        censor_mask = rng.random(n) < censor_rate
+        # for those, draw a random censoring time between 0 and censor_time
+        extra_censor = rng.random(n) * censor_time
+        # apply extra censoring where earlier than observed_time
+        observed_time = np.where(censor_mask & (extra_censor < observed_time), extra_censor, observed_time)
+        event = np.where(censor_mask & (extra_censor < times), 0, event)
 
     df = pd.DataFrame(
         {

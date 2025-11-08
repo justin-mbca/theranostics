@@ -8,8 +8,9 @@ from theranostics.dicom_ingest import ingest_directory
 
 
 @task
-def make_data(n: int = 500):
-    df = generate_cohort(n=n)
+def make_data(n: int = 500, censor_rate: float = 0.0, biomarker_effect: float = 0.3):
+    # default censor_rate=0.0 preserves previous behavior
+    df = generate_cohort(n=n, censor_rate=censor_rate, biomarker_effect=biomarker_effect)
     return df
 
 
@@ -37,21 +38,26 @@ def dicom_ingest_task(dicom_dir: str, out_parquet: str):
 
 
 @flow
-def pipeline_with_dicom(n: int = 500, dicom_dir: str = None, out_parquet: str = 'data/bronze/dicom.parquet'):
-    """Run the demo pipeline and optionally ingest DICOMs.
+def pipeline_with_dicom(n: int = 500, dicom_dir: str = None, out_parquet: str = 'data/bronze/dicom.parquet', censor_rate: float = 0.0, biomarker_effect: float = 0.3):
+        """Run the demo pipeline and optionally ingest DICOMs.
 
-    Returns a dict with model results. If `dicom_dir` is provided the dict
-    will include the numeric key `dicom_count` (int) indicating how many
-    DICOM files were processed and written to `out_parquet`.
-    """
+        Returns a dict with model results. If `dicom_dir` is provided the dict
+        will include the numeric key `dicom_count` (int) indicating how many
+        DICOM files were processed and written to `out_parquet`.
 
-    df = make_data(n)
-    results = train_models(df)
-    if dicom_dir:
-        # Call the task synchronously so the flow returns the numeric count
-        dicom_count = dicom_ingest_task(dicom_dir, out_parquet)
-        return {**results, 'dicom_count': dicom_count}
-    return results
+        Parameters:
+        - censor_rate: float between 0 and 1 to introduce additional random censoring
+            to the synthetic cohort (useful for testing different censoring regimes).
+        """
+
+        # pass censor_rate and biomarker_effect into cohort generation
+        df = generate_cohort(n=n, censor_rate=censor_rate, biomarker_effect=biomarker_effect)
+        results = train_models(df)
+        if dicom_dir:
+                # Call the task synchronously so the flow returns the numeric count
+                dicom_count = dicom_ingest_task(dicom_dir, out_parquet)
+                return {**results, 'dicom_count': dicom_count}
+        return results
 
 
 if __name__ == "__main__":

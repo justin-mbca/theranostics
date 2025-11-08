@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/justin/theranostics/mlruns/279393480852784511/2b54d7d148f34b85abc2cdbf02a628ea/artifacts
+end_time: 1762462498470
+entry_point_name: ''
+experiment_id: '279393480852784511'
+lifecycle_stage: active
+run_id: 2b54d7d148f34b85abc2cdbf02a628ea
+run_name: bustling-cod-931
+run_uuid: 2b54d7d148f34b85abc2cdbf02a628ea
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1762462498463
+status: 3
+tags: []
+user_id: justin

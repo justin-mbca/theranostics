@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/justin/theranostics/mlruns/279393480852784511/9b9688876a5c4a8a935e9002a8927017/artifacts
+end_time: 1762462476427
+entry_point_name: ''
+experiment_id: '279393480852784511'
+lifecycle_stage: active
+run_id: 9b9688876a5c4a8a935e9002a8927017
+run_name: orderly-jay-966
+run_uuid: 9b9688876a5c4a8a935e9002a8927017
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1762462476420
+status: 3
+tags: []
+user_id: justin

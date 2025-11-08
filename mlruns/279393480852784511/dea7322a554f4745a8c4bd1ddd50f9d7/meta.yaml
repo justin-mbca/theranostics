@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/justin/theranostics/mlruns/279393480852784511/dea7322a554f4745a8c4bd1ddd50f9d7/artifacts
+end_time: 1762462496222
+entry_point_name: ''
+experiment_id: '279393480852784511'
+lifecycle_stage: active
+run_id: dea7322a554f4745a8c4bd1ddd50f9d7
+run_name: nebulous-carp-722
+run_uuid: dea7322a554f4745a8c4bd1ddd50f9d7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1762462496214
+status: 3
+tags: []
+user_id: justin

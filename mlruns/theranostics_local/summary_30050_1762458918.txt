@@ -1,0 +1,15 @@
+params:
+{
+  "n": 5
+}
+metrics:
+{
+  "km_median_survival": 127.09464683794911
+}
+artifacts:
+{
+  "km_survival_table": "artifacts/experiments/km_survival_table.csv",
+  "cox_summary_csv": "artifacts/experiments/cox_summary.csv",
+  "cox_summary_json": "artifacts/experiments/cox_summary.json",
+  "cox_input_csv": "artifacts/experiments/cox_input.csv"
+}

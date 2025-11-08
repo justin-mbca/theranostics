@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/justin/theranostics/mlruns/279393480852784511/8114936a8f7346f0aefa8f176f33f22f/artifacts
+end_time: 1762462498150
+entry_point_name: ''
+experiment_id: '279393480852784511'
+lifecycle_stage: active
+run_id: 8114936a8f7346f0aefa8f176f33f22f
+run_name: flawless-calf-429
+run_uuid: 8114936a8f7346f0aefa8f176f33f22f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1762462498143
+status: 3
+tags: []
+user_id: justin
