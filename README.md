@@ -109,3 +109,27 @@ Notes and considerations
 - De-identification: ensure PHI is removed before storing or sharing images/notes. Implement DICOM de-id as a Prefect task in the bronze→silver step.
 - Storage: for production, write bronze/silver/gold into object storage (S3) and register datasets in a feature store.
 - Reproducibility: pin dependency versions and capture environment with a lockfile or container image.
+
+AI input / DICOM preprocessing (how 2D images are created for CNNs)
+---------------------------------------------------------------
+- Read `pydicom.dataset.FileDataset` and obtain the pixel array: `arr = ds.pixel_array`.
+- Apply modality rescale when present: `arr = arr * RescaleSlope + RescaleIntercept`.
+- Correct PhotometricInterpretation (invert for `MONOCHROME1`) and honor `PixelRepresentation` (signed vs unsigned).
+- Use WindowCenter/WindowWidth when available. For CT defaults use modality-appropriate windows (e.g., soft-tissue: C=40,W=400; lung: C=-600,W=1500).
+- Clip/scale the windowed data and normalize (min-max to 0..1 or z-score). For transfer learning, convert to 3-channel and apply ImageNet mean/std.
+- Resample or resize to a consistent pixel spacing and image size. Use SimpleITK for medically-correct resampling if exact spacing preservation is required.
+- Cache preprocessed arrays (NPZ/HDF5) to avoid expensive repeated DICOM decoding during training.
+
+Artifacts, ML runs, and repository hygiene
+-----------------------------------------
+- Experiment artifacts and local MLflow-style runs are saved under `mlruns/` and `artifacts/experiments/` by the demo flows. These are useful for reproducibility but are usually not committed to Git for large projects.
+- Recommended actions:
+	- Add `mlruns/`, `artifacts/`, and `data/` to `.gitignore` for normal development.
+	- If you accidentally committed large artifacts and want to remove them from history, use `git rm --cached` and optionally `git filter-repo` or `git filter-branch` (careful: rewrites history).
+
+Next steps (optional)
+---------------------
+- Add `theranostics/image_prep.py` with the `dicom_to_array`, `apply_window`, and `prepare_dicom_image` helpers used by the demo. I can add this module and a small notebook that visualizes windowed results.
+- Convert the CI smoke script into a pytest-based smoke test (so CI reports it in JUnit output).
+
+If you'd like, I can add the `image_prep` module and demo notebook now and create a small test that verifies `RescaleIntercept` and windowing behavior.
